@@ -33,7 +33,7 @@ async def message_command(ctx: tanjun.abc.MessageContext) -> None:
 
     data = await get_reponse(prompt)
 
-    await ctx.reponse(data["response"])
+    await ctx.respond(data["response"])
 
 
 @tanjun.as_loader
