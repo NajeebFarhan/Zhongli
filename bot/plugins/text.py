@@ -1,33 +1,39 @@
-import hikari
 import tanjun
 import requests
+import json
+import os
 from typing import Final
 
 component = tanjun.Component().load_from_scope()
 
-# OLLAMA_API_URL: Final[str] = "http://localhost:11434/api/generate"
+
+async def get_reponse(user_prompt: str) -> str:
+    OLLAMA_API_URL: Final[str] = os.environ.get("LLM_URL")
+
+    with open(os.path.abspath("bot/prompt.json"), "r") as f:
+        prompt = json.load(f)
+
+    prompt["prompt"] = user_prompt
+
+    response = requests.post(OLLAMA_API_URL, json=prompt)
+
+    data = response.json()
+    data["response"] = data["response"].split("</think>")[1].strip()
+
+    return data
 
 
-# @component.with_slash_command
-# @tanjun.as_slash_command("text", "Gives an AI generated response based on your prompt")
-# @tanjun.with_option("message")
-# async def test(ctx: tanjun.abc.MessageContext) -> None:
-#     await ctx.respond("Placeholder text. It will be an AI reponse next time")
-#     # print(ctx.message)
-
-
-# @tanjun.with_option(
-#     "reason", "--reason", "-r", default=None
-# )  # This can be triggered as --reason or -r
-# @tanjun.with_multi_option(
-#     "users", "--user", "-u", default=None
-# )  # This can be triggered as --user or -u
-# @tanjun.with_greedy_argument("content")
-# @tanjun.with_argument("days", converters=int)
-@component.with_command
+@component.with_message_command
 @tanjun.as_message_command("text", "description")
 async def message_command(ctx: tanjun.abc.MessageContext) -> None:
-    await ctx.respond("testing")
+    PREFIX = os.environ.get("BOT_PREFIX")
+    prompt = (
+        ctx.message.content.removeprefix(PREFIX).strip().removeprefix("text").strip()
+    )
+
+    data = await get_reponse(prompt)
+
+    await ctx.reponse(data["response"])
 
 
 @tanjun.as_loader

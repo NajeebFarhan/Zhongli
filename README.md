@@ -1,1 +1,1 @@
-# Zhongli
+# DeepSeek-R1 based discord bot
