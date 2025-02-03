@@ -45,7 +45,6 @@ async def text(ctx: tanjun.abc.MessageContext) -> None:
     prompt: str = " ".join(
         ctx.message.content.removeprefix(PREFIX).strip().split(" ")[1:]
     )
-    print(prompt)
 
     msg = await ctx.respond("Hold on! Wait a minute!...")
 
