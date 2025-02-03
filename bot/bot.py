@@ -34,5 +34,6 @@ def make_client(bot: hikari.GatewayBot) -> tanjun.Client:
     ).add_prefix(PREFIX)
 
     client.load_modules("bot.plugins.text")
+    client.load_modules("bot.plugins.eval")
 
     return client

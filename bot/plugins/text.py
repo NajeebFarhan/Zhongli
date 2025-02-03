@@ -40,14 +40,15 @@ async def text(ctx: tanjun.abc.MessageContext) -> None:
     if ctx.author.is_bot:
         return
 
-    PREFIX = os.environ.get("BOT_PREFIX")
-    prompt = (
-        ctx.message.content.removeprefix(PREFIX).strip().removeprefix("text").strip()
+    PREFIX: Final[str] = os.environ.get("BOT_PREFIX")
+    prompt: str = " ".join(
+        ctx.message.content.removeprefix(PREFIX).strip().split(" ")[1:]
     )
+    print(prompt)
 
     msg = await ctx.respond("Hold on! Wait a minute!...")
 
-    data = get_reponse(ctx.author.id, prompt)
+    data = get_reponse(str(ctx.author.id), prompt)
 
     await msg.edit(data["response"])
 
