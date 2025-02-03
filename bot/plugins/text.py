@@ -8,7 +8,7 @@ from .prompt import get_prompt
 component = tanjun.Component().load_from_scope()
 
 
-async def get_reponse(id: str, user_prompt: str) -> str:
+def get_reponse(id: str, user_prompt: str) -> str:
     OLLAMA_API_URL: Final[str] = os.environ.get("LLM_URL")
 
     prompt = get_prompt(id)
@@ -35,8 +35,8 @@ async def get_reponse(id: str, user_prompt: str) -> str:
 
 
 @component.with_message_command
-@tanjun.as_message_command("text", "description")
-async def message_command(ctx: tanjun.abc.MessageContext) -> None:
+@tanjun.as_message_command("text", "txt")
+async def text(ctx: tanjun.abc.MessageContext) -> None:
     if ctx.author.is_bot:
         return
 
@@ -45,9 +45,9 @@ async def message_command(ctx: tanjun.abc.MessageContext) -> None:
         ctx.message.content.removeprefix(PREFIX).strip().removeprefix("text").strip()
     )
 
-    msg = await ctx.respond("Thinking...")
+    msg = await ctx.respond("Hold on! Wait a minute!...")
 
-    data = await get_reponse(ctx.author.id, prompt)
+    data = get_reponse(ctx.author.id, prompt)
 
     await msg.edit(data["response"])
 
