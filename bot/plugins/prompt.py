@@ -29,17 +29,7 @@ def get_prompt(id: str) -> tuple[str, list[dict[str, str]]]:
                     ]
                 )
             )
-            # print(full_prompt)
             return full_prompt, chat_history[id]
 
         chat_history[id] = []
-        # print(f.read())
         return f.read(), chat_history[id]
-
-
-# def create_prompt() -> dict[str, dict[str, Any]]:
-
-#     with open(os.path.abspath("bot/" + PROMPT_FILE), "r") as f:
-#         prompt: dict[str, dict[str, Any]] = json.load(f)
-
-#     return prompt
