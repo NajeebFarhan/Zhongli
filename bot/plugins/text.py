@@ -12,16 +12,17 @@ component = tanjun.Component().load_from_scope()
 def get_reponse(id: str, user_prompt: str) -> str:
     OLLAMA_API_URL: Final[str] = os.environ.get("LLM_URL")
 
-    prompt = get_prompt(id)
+    prompt, chat_history = get_prompt(id)
 
-    user_message = {"role": "user", "content": user_prompt}
-    prompt["messages"].append(user_message)
+    full_prompt = prompt + f"\nUser: {user_prompt}\n"
 
-    prompt["prompt"] = "\n".join(
-        [f"{msg['role'].capitalize()}: {msg['content']}" for msg in prompt["messages"]]
-    )
+    chat_history.append({"role": "User", "content": user_prompt})
 
-    response = requests.post(OLLAMA_API_URL, json=prompt)
+    print(full_prompt)
+    json_config = {"model": "deepseek-r1:1.5b", "prompt": full_prompt, "stream": False}
+
+    print(json_config)
+    response = requests.post(OLLAMA_API_URL, json=json_config)
 
     if response.status_code != 200:
         raise Exception("LLM not loaded yet")
@@ -29,8 +30,7 @@ def get_reponse(id: str, user_prompt: str) -> str:
     data = response.json()
     data["response"] = data["response"].split("</think>")[-1].strip()
 
-    assistant_message = {"role": "assistant", "content": data["response"]}
-    prompt["messages"].append(assistant_message)
+    chat_history.append({"role": "Hu Tao", "content": data["response"]})
 
     return data
 
@@ -53,7 +53,7 @@ async def text(ctx: tanjun.abc.MessageContext) -> None:
     t2 = time.time()
 
     await msg.delete()
-    await ctx.edit(f"> {(t2 - t1):.2f} seconds\n" + data["response"])
+    await ctx.respond(f"> {(t2 - t1):.2f} seconds\n" + data["response"])
 
 
 @tanjun.as_loader

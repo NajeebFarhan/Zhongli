@@ -2,37 +2,44 @@ import os
 import json
 from typing import Final, Any
 
-prompts: dict[str, dict[str, Any]] = {
+chat_history: dict[list[dict[str, str]]] = {
     # "234234":
-    #     {
-    #         "model": "llm model",
-    #         "messages": [
-    #             {
-    #                 "role": "user", "content": "be a nice assistant"
-    #             }
-    #         ],
-    #         "stream": False
-    #     }
+    #     [
+    #         {
+    #             "role": "User", "content": "How are you?"
+    #         },
+    #         {
+    #             "role": "Hu Tao", "content": "I am fine"
+    #         }
+    #     ]
 }
 
 
-def get_prompt(id: str) -> dict[str, dict[str, Any]]:
-    if id in prompts.keys():
-        return prompts[id]
-
-    else:
-        prompt = create_prompt()
-
-        prompts[id] = prompt
-        prompts[id]["model"] = os.environ.get("LLM")
-
-        return prompts[id]
-
-
-def create_prompt() -> dict[str, dict[str, Any]]:
-    PROMPT_FILE: Final[str] = "prompt.json"
-
+def get_prompt(id: str) -> tuple[str, list[dict[str, str]]]:
+    PROMPT_FILE: Final[str] = "prompt.txt"
     with open(os.path.abspath("bot/" + PROMPT_FILE), "r") as f:
-        prompt: dict[str, dict[str, Any]] = json.load(f)
+        if id in chat_history.keys():
+            full_prompt = (
+                f.read()
+                + "\n"
+                + "\n".join(
+                    [
+                        f"{chat['role']}: {chat['content']}"
+                        for chat in chat_history.get(id)
+                    ]
+                )
+            )
+            # print(full_prompt)
+            return full_prompt, chat_history[id]
 
-    return prompt
+        chat_history[id] = []
+        # print(f.read())
+        return f.read(), chat_history[id]
+
+
+# def create_prompt() -> dict[str, dict[str, Any]]:
+
+#     with open(os.path.abspath("bot/" + PROMPT_FILE), "r") as f:
+#         prompt: dict[str, dict[str, Any]] = json.load(f)
+
+#     return prompt
