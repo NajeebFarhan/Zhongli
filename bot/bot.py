@@ -4,9 +4,10 @@ import tanjun
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 
 def build_bot() -> hikari.GatewayBot:
-    load_dotenv()
 
     Intents = hikari.intents.Intents
     INTENTS = (

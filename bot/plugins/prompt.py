@@ -1,9 +1,6 @@
 import os
-from dotenv import load_dotenv
 import json
 from typing import Final, Any
-
-load_dotenv()
 
 prompts: dict[str, dict[str, Any]] = {
     # "234234":
