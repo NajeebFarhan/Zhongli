@@ -52,7 +52,8 @@ async def text(ctx: tanjun.abc.MessageContext) -> None:
     data = get_reponse(str(ctx.author.id), prompt)
     t2 = time.time()
 
-    await msg.edit(f"> {(t2 - t1):.2f} seconds\n" + data["response"])
+    await msg.delete()
+    await ctx.edit(f"> {(t2 - t1):.2f} seconds\n" + data["response"])
 
 
 @tanjun.as_loader
