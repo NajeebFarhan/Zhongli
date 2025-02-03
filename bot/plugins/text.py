@@ -2,6 +2,7 @@ import tanjun
 import requests
 import os
 from typing import Final
+import time
 
 from .prompt import get_prompt
 
@@ -48,9 +49,11 @@ async def text(ctx: tanjun.abc.MessageContext) -> None:
 
     msg = await ctx.respond("Hold on! Wait a minute!...")
 
+    t1 = time.time()
     data = get_reponse(str(ctx.author.id), prompt)
+    t2 = time.time()
 
-    await msg.edit(data["response"])
+    await msg.edit(f"> {(t2 - t1):.2f} seconds\n" + data["response"])
 
 
 @tanjun.as_loader
