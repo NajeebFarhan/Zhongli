@@ -1,0 +1,6 @@
+{
+    "model": "deepseek-r1:1.5b",
+    "stream": false,
+    "temperature": 0.8,
+    "top_p": 0.9
+}

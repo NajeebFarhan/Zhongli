@@ -1,5 +1,4 @@
 import os
-import json
 from typing import Final, Any
 
 chat_history: dict[list[dict[str, str]]] = {
@@ -9,15 +8,15 @@ chat_history: dict[list[dict[str, str]]] = {
     #             "role": "User", "content": "How are you?"
     #         },
     #         {
-    #             "role": "Hu Tao", "content": "I am fine"
+    #             "role": "Hu Tao(You)", "content": "I am fine"
     #         }
     #     ]
 }
 
 
 def get_prompt(id: str) -> tuple[str, list[dict[str, str]]]:
-    PROMPT_FILE: Final[str] = "prompt.txt"
-    with open(os.path.abspath("bot/" + PROMPT_FILE), "r") as f:
+    PROMPT_FILE: Final[str] = "bot/prompt.txt"
+    with open(os.path.abspath(PROMPT_FILE), "r") as f:
         if id in chat_history.keys():
             full_prompt = (
                 f.read()
@@ -28,6 +27,7 @@ def get_prompt(id: str) -> tuple[str, list[dict[str, str]]]:
                         for chat in chat_history.get(id)
                     ]
                 )
+                + "\n"
             )
             return full_prompt, chat_history[id]
 

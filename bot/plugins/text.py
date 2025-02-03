@@ -1,6 +1,7 @@
 import tanjun
 import requests
 import os
+import json
 from typing import Final
 import time
 
@@ -11,7 +12,7 @@ component = tanjun.Component().load_from_scope()
 
 def get_reponse(id: str, user_prompt: str) -> str:
     OLLAMA_API_URL: Final[str] = os.environ.get("LLM_URL")
-    MODEL = os.environ.get("LLM")
+    config_path = "bot/config.json"
 
     prompt, chat_history = get_prompt(id)
 
@@ -19,11 +20,12 @@ def get_reponse(id: str, user_prompt: str) -> str:
 
     chat_history.append({"role": "User", "content": user_prompt})
 
-    print(full_prompt)
-    json_config = {"model": MODEL, "prompt": full_prompt, "stream": False}
+    with open(os.path.abspath(config_path), "r") as f:
+        config = json.load(f)
 
-    print(json_config)
-    response = requests.post(OLLAMA_API_URL, json=json_config)
+    config["prompt"] = full_prompt
+
+    response = requests.post(OLLAMA_API_URL, json=config)
 
     if response.status_code != 200:
         raise Exception("LLM not loaded yet")
