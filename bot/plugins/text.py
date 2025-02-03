@@ -11,6 +11,7 @@ component = tanjun.Component().load_from_scope()
 
 def get_reponse(id: str, user_prompt: str) -> str:
     OLLAMA_API_URL: Final[str] = os.environ.get("LLM_URL")
+    MODEL = os.environ.get("LLM")
 
     prompt, chat_history = get_prompt(id)
 
@@ -19,7 +20,7 @@ def get_reponse(id: str, user_prompt: str) -> str:
     chat_history.append({"role": "User", "content": user_prompt})
 
     print(full_prompt)
-    json_config = {"model": "deepseek-r1:1.5b", "prompt": full_prompt, "stream": False}
+    json_config = {"model": MODEL, "prompt": full_prompt, "stream": False}
 
     print(json_config)
     response = requests.post(OLLAMA_API_URL, json=json_config)
