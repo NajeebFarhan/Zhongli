@@ -5,7 +5,7 @@ import json
 from typing import Final
 import time
 
-from .prompt import get_prompt
+from .prompt import get_chat
 
 component = tanjun.Component().load_from_scope()
 
@@ -14,16 +14,16 @@ def get_reponse(id: str, user_prompt: str) -> str:
     OLLAMA_API_URL: Final[str] = os.environ.get("LLM_URL")
     config_path = "bot/config.json"
 
-    prompt, chat_history = get_prompt(id)
+    chat, chat_history = get_chat(id)
 
-    full_prompt = prompt + f"\nUser: {user_prompt}\n"
+    context = chat + f'\nUser: "{user_prompt}"\nAssistant: '
 
-    chat_history.append({"role": "User", "content": user_prompt})
+    chat_history.append({"role": "user", "content": user_prompt})
 
     with open(os.path.abspath(config_path), "r") as f:
         config = json.load(f)
 
-    config["prompt"] = full_prompt
+    config["prompt"] = context
 
     response = requests.post(OLLAMA_API_URL, json=config)
 
@@ -33,7 +33,7 @@ def get_reponse(id: str, user_prompt: str) -> str:
     data = response.json()
     data["response"] = data["response"].split("</think>")[-1].strip()
 
-    chat_history.append({"role": "Hu Tao", "content": data["response"]})
+    chat_history.append({"role": "assistant", "content": data["response"]})
 
     return data
 
@@ -52,11 +52,16 @@ async def text(ctx: tanjun.abc.MessageContext) -> None:
     msg = await ctx.respond("Hold on! Wait a minute!...")
 
     t1 = time.time()
-    data = get_reponse(str(ctx.author.id), prompt)
-    t2 = time.time()
+    try:
+        data = get_reponse(str(ctx.author.id), prompt)
+        response = data["response"]
+    except Exception:
+        response = "Something went wrong! Try again."
 
-    await msg.delete()
-    await ctx.respond(f"> {(t2 - t1):.2f} seconds\n" + data["response"])
+    finally:
+        await msg.delete()
+        t2 = time.time()
+        await ctx.respond(f"> {(t2 - t1):.2f} seconds\n" + response)
 
 
 @tanjun.as_loader

@@ -16,7 +16,8 @@ async def admin_eval(ctx: tanjun.abc.MessageContext):
     )
 
     if str(ctx.author.id) == OWNER:
-        eval(prompt)
+        cc = compile(prompt, "<string>", "single")
+        eval(cc)
 
 
 @tanjun.as_loader

@@ -1,7 +1,7 @@
 import os
-from typing import Final, Any
+from typing import Final
 
-chat_history: dict[list[dict[str, str]]] = {
+chat_history: dict[str, list[dict[str, str]]] = {
     # "234234":
     #     [
     #         {
@@ -14,22 +14,22 @@ chat_history: dict[list[dict[str, str]]] = {
 }
 
 
-def get_prompt(id: str) -> tuple[str, list[dict[str, str]]]:
+def get_chat(id: str) -> tuple[str, list[dict[str, str]]]:
     PROMPT_FILE: Final[str] = "bot/prompt.txt"
     with open(os.path.abspath(PROMPT_FILE), "r") as f:
         if id in chat_history.keys():
-            full_prompt = (
+            context = (
                 f.read()
-                + "\n"
+                + "\n\n"
                 + "\n".join(
                     [
-                        f"{chat['role']}: {chat['content']}"
-                        for chat in chat_history.get(id)
+                        f"{chat['role'].capitalize()}: \"{chat['content']}\""
+                        for chat in chat_history[id]
                     ]
                 )
                 + "\n"
             )
-            return full_prompt, chat_history[id]
+            return context, chat_history[id]
 
         chat_history[id] = []
         return f.read(), chat_history[id]
